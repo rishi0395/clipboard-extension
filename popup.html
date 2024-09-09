@@ -1,20 +1,44 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Clipboard List</title>
+    <title>Clipboard Tracker</title>
     <style>
+      body {
+        width: 300px;
+        font-family: Arial, sans-serif;
+      }
       ul {
         list-style-type: none;
         padding: 0;
       }
       li {
-        margin: 5px 0;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 5px;
+      }
+      .timestamp {
+        font-size: 0.8em;
+        color: #666;
+      }
+      .delete-btn,
+      .copy-btn {
+        cursor: pointer;
+        margin-left: 5px;
+      }
+      .delete-btn {
+        color: red;
+      }
+      .copy-btn {
+        color: green;
+      }
+      .buttons {
+        float: right;
       }
     </style>
   </head>
   <body>
-    <h1>Copied Items</h1>
-    <ul id="items"></ul>
+    <h2>Copied Items</h2>
+    <ul id="itemsList"></ul>
     <script src="popup.js"></script>
   </body>
 </html>
