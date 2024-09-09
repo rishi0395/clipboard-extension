@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "Clipboard Tracker",
+  "version": "1.0",
+  "permissions": ["storage", "activeTab", "tabs", "scripting", "background"],
+  "host_permissions": ["https://note-server-fbej.onrender.com/*"],
+  "background": {
+    "service_worker": "background.bundle.js"
+  },
+  "commands": {
+    "copy_item": {
+      "suggested_key": {
+        "default": "Ctrl+C",
+        "mac": "Command+C"
+      },
+      "description": "Add the copied item to the list"
+    }
+  },
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self';"
+  }
+}
