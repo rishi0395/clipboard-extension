@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Clipboard Tracker",
+  "version": "1.0",
+  "permissions": ["clipboardRead", "storage", "activeTab", "tabs", "scripting"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "commands": {
+    "copy_item": {
+      "suggested_key": {
+        "default": "Ctrl+C",
+        "mac": "Command+C"
+      },
+      "description": "Add the copied item to the list"
+    }
+  }
+}

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Clipboard Sync - Options</title>
+  </head>
+  <body>
+    <h1>Options</h1>
+    <button id="clearHistory">Clear Clipboard History</button>
+
+    <script>
+      document.getElementById("clearHistory").addEventListener("click", () => {
+        chrome.storage.sync.set({ clipboardHistory: [] });
+        alert("Clipboard history cleared!");
+      });
+    </script>
+  </body>
+</html>
