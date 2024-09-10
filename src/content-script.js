@@ -1,7 +1,13 @@
-// content-script.js
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.type === "PASTE_TEXT") {
-    pasteText(request.text);
+chrome.storage.sync.get("extensionEnabled", (data) => {
+  if (data.extensionEnabled !== false) {
+    // Your existing content script code
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+      if (request.type === "PASTE_TEXT") {
+        pasteText(request.text);
+      }
+    });
+  } else {
+    console.log("Extension is disabled. Content script won't run.");
   }
 });
 
@@ -15,6 +21,17 @@ function pasteText(text) {
       textarea.value = text;
       textarea.dispatchEvent(new Event("input", { bubbles: true }));
       console.log("Text pasted successfully");
+
+      // Locate the Send button by its data-testid attribute and click it
+      const sendButton = document.querySelector(
+        'button[data-testid="send-button"]'
+      );
+      if (sendButton) {
+        sendButton.click();
+        console.log("Send button clicked");
+      } else {
+        console.log("Send button not found");
+      }
     } else {
       attempts++;
       if (attempts < maxAttempts) {
