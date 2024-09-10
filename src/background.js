@@ -1,6 +1,4 @@
-import { generateRandomTextArray } from "./utils";
-
-const API_BASE_URL = "https://note-server-fbej.onrender.com/extension/v1";
+import { deleteAllItems, fetchItems, saveItem } from "./api";
 
 chrome.runtime.onInstalled.addListener(() => {
   console.log("Extension installed");
@@ -70,69 +68,64 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   console.log("Received message:", message);
 
   switch (message.type) {
-    case "fetch":
-      fetch(`${API_BASE_URL}/fetch`)
-        .then((response) => response.json())
+    case "fetch": {
+      fetchItems()
         .then((data) => {
           sendResponse({ items: data || [] });
         })
         .catch((error) => {
-          console.error("Failed to fetch items:", error);
-          sendResponse({
-            items: [],
-          }); // Send an empty array in case of error
+          console.log("Fetch error:", error);
+          sendResponse({ items: [] });
         });
-      return true; // Indicates that response will be sent asynchronously
 
-    case "deleteAll":
-      fetch(`${API_BASE_URL}/deleteAll`, {
-        method: "DELETE",
-      })
-        .then(() => {
-          console.log("All items deleted.");
+      return true; // Keeps the connection alive until `sendResponse` is called
+    }
+
+    case "deleteAll": {
+      deleteAllItems()
+        .then((data) => {
           sendResponse({ success: true });
         })
         .catch((error) => {
-          console.error("Failed to delete all items:", error);
+          console.error("Delete all error:", error);
           sendResponse({ success: false });
         });
-      return true; // Indicates that response will be sent asynchronously
 
-    case "clipboardText":
+      return true; // Keeps the connection alive until `sendResponse` is called
+    }
+
+    case "clipboardText": {
       saveToServer(message.text);
-      break;
+      sendResponse({ success: true });
+      return true; // Keeps the connection alive
+    }
 
-    // Other cases if needed...
+    case "getAllItems": {
+      fetchItems()
+        .then((data) => {
+          sendResponse({ items: data || [] });
+        })
+        .catch((error) => {
+          console.error("Get all items error:", error);
+          sendResponse({ items: [] });
+        });
+
+      return true; // Keeps the connection alive until `sendResponse` is called
+    }
+
+    default: {
+      console.error("Unknown message type:", message.type);
+      sendResponse({ error: "Unknown message type" });
+      return false;
+    }
   }
 });
 
-function saveToServer(text) {
-  fetch(`${API_BASE_URL}/saveItem`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text: text }),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      console.log("Item saved:", text);
-    })
-    .catch((error) => {
-      console.error("Failed to save item:", error);
-    });
+async function saveToServer(text) {
+  try {
+    await saveItem({ text });
+    console.log("Item saved:", text);
+  } catch (error) {
+    console.error("Failed to save item:", error);
+  }
 }
-
-// Expose the getAllItems function to be callable from popup.js
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === "getAllItems") {
-    fetch(`${API_BASE_URL}/fetch`)
-      .then((response) => response.json())
-      .then((data) => {
-        sendResponse({ items: data.items || [] });
-      })
-      .catch((error) => {
-        console.error("Failed to fetch items:", error);
-        sendResponse({ items: [] }); // Send an empty array in case of error
-      });
-    return true; // Will respond asynchronously
-  }
-});
