@@ -113,6 +113,36 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       return true; // Keeps the connection alive until `sendResponse` is called
     }
 
+    case "openChatGPT": {
+      chrome.tabs.create({ url: "https://chat.openai.com/" }, (tab) => {
+        chrome.tabs.onUpdated.addListener(function listener(tabId, info) {
+          if (tabId === tab.id && info.status === "complete") {
+            chrome.tabs.onUpdated.removeListener(listener);
+
+            // Wait a bit to ensure the page is fully loaded
+            setTimeout(() => {
+              chrome.tabs.sendMessage(
+                tabId,
+                {
+                  type: "PASTE_TEXT",
+                  text: message.text,
+                },
+                (response) => {
+                  if (chrome.runtime.lastError) {
+                    console.error(chrome.runtime.lastError);
+                  } else {
+                    console.log("Message sent successfully");
+                  }
+                }
+              );
+            }, 1000);
+          }
+        });
+      });
+      sendResponse({ success: true });
+      return true;
+    }
+
     default: {
       console.error("Unknown message type:", message.type);
       sendResponse({ error: "Unknown message type" });

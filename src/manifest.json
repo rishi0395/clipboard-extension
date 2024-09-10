@@ -7,6 +7,13 @@
   "background": {
     "service_worker": "background.bundle.js"
   },
+  "content_scripts": [
+    {
+      "matches": ["https://chatgpt.com/*"],
+      "js": ["content-script.bundle.js"],
+      "run_at": "document_idle"
+    }
+  ],
   "commands": {
     "copy_item": {
       "suggested_key": {

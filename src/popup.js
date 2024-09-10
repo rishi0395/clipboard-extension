@@ -39,6 +39,9 @@ document.addEventListener("DOMContentLoaded", function () {
               <button class="delete-btn" data-timestamp="${
                 item.timestamp
               }">Delete</button>
+              <button class="chatgpt-btn" data-text="${encodeURIComponent(
+                item.text
+              )}">Open in ChatGPT</button>
             </div>
           `;
           itemsList.appendChild(li);
@@ -82,6 +85,17 @@ document.addEventListener("DOMContentLoaded", function () {
               .catch((err) => {
                 console.error("Failed to copy text: ", err);
               });
+          });
+        });
+
+        // Add event listeners for new ChatGPT buttons
+        document.querySelectorAll(".chatgpt-btn").forEach((btn) => {
+          btn.addEventListener("click", function () {
+            const text = decodeURIComponent(this.getAttribute("data-text"));
+            chrome.runtime.sendMessage({
+              type: "openChatGPT",
+              text: text,
+            });
           });
         });
       } else {
